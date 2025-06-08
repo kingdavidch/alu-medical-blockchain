@@ -1,0 +1,26 @@
+# Build directories
+bin/
+obj/
+
+# Object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencies
+node_modules/ 
