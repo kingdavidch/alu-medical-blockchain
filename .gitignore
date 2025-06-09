@@ -23,4 +23,8 @@ obj/
 *.swo
 
 # Dependencies
-node_modules/ 
+node_modules/
+
+# Build artifacts and generated files
+.cache/
+compile_commands.json 

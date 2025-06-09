@@ -3,14 +3,31 @@
 #include <string.h>
 #include <time.h>
 #include <openssl/sha.h>
+#include <openssl/evp.h>
 #include "utils.h"
 
 void sha256(const char* input, char* output) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, input, strlen(input));
-    SHA256_Final(hash, &sha256);
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) {
+        // Handle error, e.g., log or return early if applicable
+        return;
+    }
+
+    if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return;
+    }
+    if (EVP_DigestUpdate(mdctx, input, strlen(input)) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return;
+    }
+    unsigned int md_len;
+    if (EVP_DigestFinal_ex(mdctx, hash, &md_len) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return;
+    }
+    EVP_MD_CTX_free(mdctx);
 
     // Convert to hex string
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {

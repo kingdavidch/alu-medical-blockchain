@@ -115,6 +115,8 @@ int cmd_add(Blockchain* chain, int argc, char** argv) {
 }
 
 int cmd_mine(Blockchain* chain, int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     if (chain->latest->transaction_count == 0) {
         print_error("No transactions to mine");
         return 1;
@@ -142,11 +144,15 @@ int cmd_mine(Blockchain* chain, int argc, char** argv) {
 }
 
 int cmd_view(Blockchain* chain, int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     print_blockchain(chain);
     return 1;
 }
 
 int cmd_verify(Blockchain* chain, int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     if (verify_chain(chain)) {
         print_success("Blockchain is valid");
     } else {
@@ -156,16 +162,24 @@ int cmd_verify(Blockchain* chain, int argc, char** argv) {
 }
 
 int cmd_help(Blockchain* chain, int argc, char** argv) {
+    (void)chain;
+    (void)argc;
+    (void)argv;
     print_help();
     return 1;
 }
 
 int cmd_exit(Blockchain* chain, int argc, char** argv) {
+    (void)chain;
+    (void)argc;
+    (void)argv;
     return 0;
 }
 
 // New command handlers
 int cmd_backup(Blockchain* chain, int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     if (backup_blockchain(chain)) {
         print_success("Blockchain backup created successfully");
     } else {
@@ -175,6 +189,8 @@ int cmd_backup(Blockchain* chain, int argc, char** argv) {
 }
 
 int cmd_restore(Blockchain* chain, int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     if (restore_blockchain(chain)) {
         print_success("Blockchain restored from backup successfully");
     } else {

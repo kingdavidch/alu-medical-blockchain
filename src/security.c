@@ -138,11 +138,34 @@ User* create_user(const char* username, const char* password, int role) {
     }
 
     // Hash password with salt
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, password, strlen(password));
-    SHA256_Update(&sha256, user->salt, SALT_SIZE);
-    SHA256_Final(user->password_hash, &sha256);
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) {
+        free(user);
+        return NULL;
+    }
+
+    if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        free(user);
+        return NULL;
+    }
+    if (EVP_DigestUpdate(mdctx, password, strlen(password)) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        free(user);
+        return NULL;
+    }
+    if (EVP_DigestUpdate(mdctx, user->salt, SALT_SIZE) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        free(user);
+        return NULL;
+    }
+    unsigned int md_len;
+    if (EVP_DigestFinal_ex(mdctx, user->password_hash, &md_len) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        free(user);
+        return NULL;
+    }
+    EVP_MD_CTX_free(mdctx);
 
     return user;
 }
@@ -151,11 +174,27 @@ int verify_user(const User* user, const char* password) {
     if (!user || !password) return 0;
 
     unsigned char hash[32];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, password, strlen(password));
-    SHA256_Update(&sha256, user->salt, SALT_SIZE);
-    SHA256_Final(hash, &sha256);
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) return 0;
+
+    if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return 0;
+    }
+    if (EVP_DigestUpdate(mdctx, password, strlen(password)) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return 0;
+    }
+    if (EVP_DigestUpdate(mdctx, user->salt, SALT_SIZE) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return 0;
+    }
+    unsigned int md_len;
+    if (EVP_DigestFinal_ex(mdctx, hash, &md_len) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return 0;
+    }
+    EVP_MD_CTX_free(mdctx);
 
     return memcmp(hash, user->password_hash, 32) == 0;
 }
