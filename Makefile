@@ -6,31 +6,32 @@ SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
-# Source files
 SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-TARGET = $(BIN_DIR)/medblockchain
+TEST_SRCS = $(filter-out $(SRC_DIR)/test_security.c, $(SRCS))
+TEST_OBJS = $(TEST_SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+TEST_TARGET = $(BIN_DIR)/test_security
 
-# Create directories
-$(shell mkdir -p $(OBJ_DIR) $(BIN_DIR))
+MAIN_SRCS = $(filter-out $(SRC_DIR)/test_security.c, $(SRCS))
+MAIN_OBJS = $(MAIN_SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+MAIN_TARGET = $(BIN_DIR)/medblockchain
 
-# Default target
-all: $(TARGET)
+.PHONY: all clean test
 
-# Link
-$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+all: $(MAIN_TARGET)
 
-# Compile
+test: $(TEST_TARGET)
+
+$(MAIN_TARGET): $(MAIN_OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(MAIN_OBJS) -o $@ $(LDFLAGS)
+
+$(TEST_TARGET): $(TEST_OBJS) $(OBJ_DIR)/test_security.o
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(TEST_OBJS) $(OBJ_DIR)/test_security.o -o $@ $(LDFLAGS)
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
-
-# Run
-run: $(TARGET)
-	./$(TARGET)
-
-.PHONY: all clean run 
+	rm -rf $(OBJ_DIR) $(BIN_DIR) 

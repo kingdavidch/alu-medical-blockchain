@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include "block.h"
 #include "blockchain.h"
 #include "utils.h"
 
@@ -46,12 +48,12 @@ int add_block(Blockchain* chain, Block* block) {
         return 0;
     }
 
-    // Verify block hash
-    if (!verify_block(block)) {
+    // Verify block's previous hash matches the latest block
+    if (strcmp(block->previous_hash, chain->latest->hash) != 0) {
         return 0;
     }
 
-    // Link block to chain
+    // Add block to chain
     chain->latest->next = block;
     chain->latest = block;
     chain->block_count++;
@@ -64,14 +66,15 @@ int mine_block(Blockchain* chain, Block* block) {
         return 0;
     }
 
-    // Mine until we find a valid hash
-    while (1) {
+    // Set previous hash
+    strncpy(block->previous_hash, chain->latest->hash, HASH_SIZE);
+    block->previous_hash[HASH_SIZE] = '\0';
+
+    // Mine block
+    do {
+        block->nonce++;
         calculate_block_hash(block);
-        if (is_valid_hash(block->hash, chain->difficulty)) {
-            break;
-        }
-        increment_nonce(&block->nonce);
-    }
+    } while (!is_valid_hash(block->hash, chain->difficulty));
 
     return 1;
 }
@@ -83,14 +86,14 @@ int verify_chain(const Blockchain* chain) {
 
     Block* current = chain->genesis;
     while (current) {
-        // Verify current block
+        // Verify block hash
         if (!verify_block(current)) {
             return 0;
         }
 
-        // Verify link to next block
-        if (current->next) {
-            if (strcmp(current->hash, current->next->previous_hash) != 0) {
+        // Verify previous hash (except for genesis block)
+        if (current != chain->genesis) {
+            if (strcmp(current->previous_hash, current->next->hash) != 0) {
                 return 0;
             }
         }
@@ -111,9 +114,17 @@ void print_blockchain(const Blockchain* chain) {
     printf("Current Difficulty: %d\n", chain->difficulty);
     printf("Chain Valid: %s\n\n", verify_chain(chain) ? "Yes" : "No");
 
+    printf("\nBlocks:\n");
+
     Block* current = chain->genesis;
     while (current) {
-        print_block(current);
+        // For now, we'll print blocks without decryption
+        printf("\nBlock #%u\n", current->id);
+        printf("Timestamp: %s", get_timestamp_str(current->timestamp));
+        printf("Previous Hash: %s\n", current->previous_hash);
+        printf("Hash: %s\n", current->hash);
+        printf("Nonce: %u\n", current->nonce);
+        printf("Transactions: %d\n", current->transaction_count);
         current = current->next;
     }
 }

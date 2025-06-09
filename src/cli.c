@@ -3,6 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 #include "cli.h"
+#include "security.h"
+
+// Static key for demonstration (in a real system, load securely)
+static unsigned char CLI_KEY[AES_KEY_SIZE] = {0};
 
 // Command definitions
 Command commands[] = {
@@ -87,15 +91,21 @@ int cmd_add(Blockchain* chain, int argc, char** argv) {
     }
 
     Transaction transaction;
+    memset(&transaction, 0, sizeof(Transaction));
     strncpy(transaction.patient_id, argv[0], sizeof(transaction.patient_id) - 1);
     strncpy(transaction.record_type, argv[1], sizeof(transaction.record_type) - 1);
-    strncpy(transaction.data, argv[2], sizeof(transaction.data) - 1);
     transaction.timestamp = time(NULL);
+    transaction.encrypted_data = encrypt_data(argv[2], CLI_KEY);
+    if (!transaction.encrypted_data) {
+        print_error("Failed to encrypt data");
+        return 1;
+    }
 
-    if (add_transaction(chain->latest, &transaction)) {
+    if (add_transaction(chain->latest, &transaction, CLI_KEY)) {
         print_success("Transaction added successfully");
     } else {
         print_error("Failed to add transaction");
+        free_encrypted_data(transaction.encrypted_data);
     }
 
     return 1;

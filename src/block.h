@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <stdint.h>
+#include "security.h"
 
 #define MAX_TRANSACTIONS 10
 #define HASH_SIZE 64  // SHA-256 produces 64 hex characters
@@ -11,7 +12,7 @@
 typedef struct {
     char patient_id[32];
     char record_type[32];  // e.g., "diagnosis", "prescription", "visit"
-    char data[256];        // The actual medical record data
+    EncryptedData* encrypted_data;  // Encrypted medical record data
     time_t timestamp;
 } Transaction;
 
@@ -30,9 +31,9 @@ typedef struct Block {
 // Function declarations
 Block* create_block(uint32_t id, const char* previous_hash);
 void calculate_block_hash(Block* block);
-int add_transaction(Block* block, const Transaction* transaction);
+int add_transaction(Block* block, const Transaction* transaction, const unsigned char* key);
 void free_block(Block* block);
 int verify_block(const Block* block);
-void print_block(const Block* block);
+void print_block(const Block* block, const unsigned char* key);
 
 #endif // BLOCK_H 
