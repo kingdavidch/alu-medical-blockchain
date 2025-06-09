@@ -3,15 +3,20 @@
 #include <string.h>
 #include "blockchain.h"
 #include "cli.h"
+#include "persistence.h"
 
 #define MAX_INPUT 1024
 
 int main(void) {
-    // Initialize blockchain
-    Blockchain* chain = create_blockchain();
+    // Try to load existing blockchain, create new one if not found
+    Blockchain* chain = load_blockchain();
     if (!chain) {
-        fprintf(stderr, "Failed to initialize blockchain\n");
-        return 1;
+        printf("No existing blockchain found. Creating new blockchain...\n");
+        chain = create_blockchain();
+        if (!chain) {
+            fprintf(stderr, "Failed to initialize blockchain\n");
+            return 1;
+        }
     }
 
     printf("ALU Medical Blockchain System\n");
@@ -31,6 +36,11 @@ int main(void) {
 
         // Handle command
         running = handle_command(chain, input);
+    }
+
+    // Save blockchain before cleanup
+    if (!save_blockchain(chain)) {
+        fprintf(stderr, "Warning: Failed to save blockchain\n");
     }
 
     // Cleanup

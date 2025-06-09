@@ -24,6 +24,7 @@ The ALU Medical Blockchain System addresses these challenges by implementing:
 - Proof of Work consensus mechanism for security
 - Command-line interface for easy interaction
 - SHA-256 hashing for data integrity
+- **Persistence and backup/restore for data reliability**
 
 ### 1.3 Objectives
 1. Create a secure medical records system
@@ -31,6 +32,7 @@ The ALU Medical Blockchain System addresses these challenges by implementing:
 3. Provide a user-friendly interface
 4. Ensure data integrity through cryptographic hashing
 5. Enable easy verification of record authenticity
+6. **Ensure blockchain data is not lost between runs (persistence)**
 
 ---
 
@@ -142,13 +144,27 @@ typedef struct {
    - Usage: `verify`
    - Checks block hashes and links
 
-5. `help` - Show help
+5. `backup` - Create a backup of the blockchain (**new**)
+   - Usage: `backup`
+   - Creates a timestamped backup of the blockchain files
+
+6. `restore` - Restore blockchain from latest backup (**new**)
+   - Usage: `restore`
+   - Restores the blockchain from the latest backup
+
+7. `help` - Show help
    - Usage: `help`
    - Displays available commands
 
-6. `exit` - Exit program
+8. `exit` - Exit program
    - Usage: `exit`
    - Safely terminates program
+
+#### 2.3.3 Persistence and Backup/Restore (**new**)
+- The blockchain is automatically saved to disk after every session.
+- On startup, the system loads the blockchain from disk if available.
+- The `backup` command creates a timestamped backup of the blockchain files.
+- The `restore` command restores the blockchain from the latest backup.
 
 ---
 
@@ -185,6 +201,15 @@ Transaction #1:
   Type: diagnosis
   Data: Patient shows symptoms of common cold
   Timestamp: 2024-06-08 10:58:24
+```
+
+### 3.4 Backup and Restore (**new**)
+```
+medblockchain> backup
+Success: Blockchain backup created successfully
+
+medblockchain> restore
+Success: Blockchain restored from backup successfully
 ```
 
 ---
@@ -225,14 +250,15 @@ The ALU Medical Blockchain System successfully implements:
 - Immutable data structure
 - User-friendly interface
 - Data integrity verification
+- **Persistence and backup/restore for reliability**
 
 ### 5.2 Future Improvements
 
 #### 5.2.1 Technical Improvements
-1. Implement data persistence
-2. Add network support for multiple nodes
-3. Enhance encryption for sensitive data
-4. Implement user authentication
+1. Add network support for multiple nodes
+2. Enhance encryption for sensitive data
+3. Implement user authentication
+4. **Encrypt backups and persistent storage**
 
 #### 5.2.2 Feature Additions
 1. Smart contracts for automated record management

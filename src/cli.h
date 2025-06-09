@@ -3,11 +3,14 @@
 
 #include "blockchain.h"
 
+// Command handler function type
+typedef int (*CommandHandler)(Blockchain* chain, int argc, char** argv);
+
 // Command structure
 typedef struct {
     const char* name;
     const char* description;
-    int (*handler)(Blockchain* chain, int argc, char** argv);
+    CommandHandler handler;
 } Command;
 
 // Available commands
@@ -25,6 +28,8 @@ int cmd_add(Blockchain* chain, int argc, char** argv);
 int cmd_mine(Blockchain* chain, int argc, char** argv);
 int cmd_view(Blockchain* chain, int argc, char** argv);
 int cmd_verify(Blockchain* chain, int argc, char** argv);
+int cmd_backup(Blockchain* chain, int argc, char** argv);
+int cmd_restore(Blockchain* chain, int argc, char** argv);
 int cmd_help(Blockchain* chain, int argc, char** argv);
 int cmd_exit(Blockchain* chain, int argc, char** argv);
 

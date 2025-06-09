@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "cli.h"
 #include "security.h"
+#include "persistence.h"
 
 // Static key for demonstration (in a real system, load securely)
 static unsigned char CLI_KEY[AES_KEY_SIZE] = {0};
@@ -14,6 +15,8 @@ Command commands[] = {
     {"mine", "Mine a new block", cmd_mine},
     {"view", "View the entire blockchain", cmd_view},
     {"verify", "Verify chain integrity", cmd_verify},
+    {"backup", "Create a backup of the blockchain", cmd_backup},
+    {"restore", "Restore blockchain from latest backup", cmd_restore},
     {"help", "Show this help message", cmd_help},
     {"exit", "Exit the program", cmd_exit},
     {NULL, NULL, NULL}  // Terminator
@@ -159,4 +162,23 @@ int cmd_help(Blockchain* chain, int argc, char** argv) {
 
 int cmd_exit(Blockchain* chain, int argc, char** argv) {
     return 0;
+}
+
+// New command handlers
+int cmd_backup(Blockchain* chain, int argc, char** argv) {
+    if (backup_blockchain(chain)) {
+        print_success("Blockchain backup created successfully");
+    } else {
+        print_error("Failed to create blockchain backup");
+    }
+    return 1;
+}
+
+int cmd_restore(Blockchain* chain, int argc, char** argv) {
+    if (restore_blockchain(chain)) {
+        print_success("Blockchain restored from backup successfully");
+    } else {
+        print_error("Failed to restore blockchain from backup");
+    }
+    return 1;
 } 

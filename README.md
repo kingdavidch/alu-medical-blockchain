@@ -10,6 +10,8 @@ A blockchain-based medical records system implemented in C for the ALU Clinic. T
 - SHA-256 hashing for data integrity
 - Transaction handling for medical records
 - Chain verification and integrity checking
+- **Persistence:** Blockchain data is automatically saved and loaded from disk
+- **Backup and Restore:** Easily create and restore blockchain backups via CLI
 
 ## Project Structure
 
@@ -25,11 +27,14 @@ A blockchain-based medical records system implemented in C for the ALU Clinic. T
 │   ├── cli.c
 │   ├── cli.h
 │   ├── utils.c
-│   └── utils.h
+│   ├── utils.h
+│   ├── persistence.c
+│   └── persistence.h
 ├── include/
 │   └── sha256.h
 ├── Makefile
-└── README.md
+├── README.md
+└── documentation.md
 ```
 
 ## Requirements
@@ -64,7 +69,7 @@ A blockchain-based medical records system implemented in C for the ALU Clinic. T
 
 Run the program:
 ```bash
-./medblockchain
+./bin/medblockchain
 ```
 
 Available commands:
@@ -72,6 +77,8 @@ Available commands:
 - `mine` - Mine a new block
 - `view` - View the entire blockchain
 - `verify` - Verify chain integrity
+- `backup` - Create a backup of the blockchain
+- `restore` - Restore blockchain from the latest backup
 - `help` - Show available commands
 - `exit` - Exit the program
 
@@ -81,6 +88,7 @@ Available commands:
 - Limited to basic Proof of Work consensus
 - No user authentication system
 - No encryption of sensitive data (basic implementation)
+- **Persistence and backup/restore are implemented, but not encrypted**
 
 ## Contributors
 
